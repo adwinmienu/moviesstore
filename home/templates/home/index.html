@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    /* Simple modern tweaks */
+    .hero {
+        background: linear-gradient(120deg, rgba(10, 132, 255, 0.12), rgba(88, 86, 214, 0.08));
+        border-radius: .6rem;
+        padding: 3rem 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+        font-weight: 700;
+        letter-spacing: .4px;
+    }
+
+    .card-movie {
+        transition: transform .15s ease, box-shadow .15s ease;
+        cursor: pointer;
+    }
+
+    .card-movie:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 30px rgba(17, 24, 39, .08);
+    }
+
+    .badge-genre {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .empty-state {
+        color: #6b7280;
+    }
+
+    @media (min-width: 992px) {
+        .search-row {
+            align-items: center;
+        }
+    }
+</style>
+
+<header class="hero text-dark text-center">
+    <div class="container">
+        <h1>Movies Store</h1>
+        <p class="mb-3">Your Ticket to Unlimited Entertainment — discover, filter and preview in one place.</p>
+
+        <form method="get" class="row g-2 justify-content-center search-row">
+            <div class="col-12 col-md-6">
+                <input name="q" value="{{ request.GET.q }}" class="form-control form-control-lg"
+                    placeholder="Search movies, actors, directors..." aria-label="Search" />
+            </div>
+            <div class="col-auto d-grid">
+                <button class="btn btn-primary btn-lg">Search</button>
+            </div>
+        </form>
+    </div>
+</header>
+
+<div class="container pb-5">
+    <!-- Featured carousel (if provided) -->
+    {% if featured %}
+    <div id="featuredCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+        <div class="carousel-inner rounded">
+            {% for m in featured %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="d-flex align-items-center p-3" style="background:#fff;">
+                    <div class="me-3" style="width:110px; flex-shrink:0;">
+                        <img src="{% if m.poster %}{{ m.poster.url }}{% else %}/static/img/placeholder-film.png{% endif %}"
+                            class="img-fluid rounded" alt="{{ m.title }}">
+                    </div>
+                    <div>
+                        <h5 class="mb-1">{{ m.title }}</h5>
+                        <p class="mb-1 text-muted">{{ m.tagline|default:m.short_description|default:"Featured pick" }}
+                        </p>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary btn-view" data-title="{{ m.title }}"
+                                data-desc="{{ m.description|default:'' }}"
+                                data-poster="{% if m.poster %}{{ m.poster.url }}{% endif %}">Quick view</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    {% endif %}
+
+    <!-- Genre chips -->
+    {% if genres %}
+    <div class="mb-3">
+        <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-secondary badge-genre" data-genre="">All</span>
+            {% for g in genres %}
+            <span class="badge bg-light text-dark badge-genre" data-genre="{{ g.name }}">{{ g.name }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Movies grid -->
+    <div id="moviesGrid" class="row g-3">
+        {% if movies %}
+        {% for movie in movies %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card card-movie h-100"
+                data-genre-list="{% for gg in movie.genres.all %}{{ gg.name }}|{% endfor %}"
+                data-title="{{ movie.title }}" data-desc="{{ movie.description|truncatechars:300 }}"
+                data-poster="{% if movie.poster %}{{ movie.poster.url }}{% endif %}">
+                <img src="{% if movie.poster %}{{ movie.poster.url }}{% else %}/static/img/placeholder-film.png{% endif %}"
+                    class="card-img-top" alt="{{ movie.title }}" style="height:300px;object-fit:cover;">
+                <div class="card-body d-flex flex-column">
+                    <h6 class="card-title mb-1">{{ movie.title }}</h6>
+                    <p class="text-muted mb-2 small">{{ movie.year|default:"" }} • {{ movie.rating|default:"" }}</p>
+                    <p class="small text-truncate mb-2">
+                        {% if movie.short_description %}
+                        {{ movie.short_description }}
+                        {% elif movie.description %}
+                        {{ movie.description }}
+                        {% else %}
+                        No description
+                        {% endif %}
+                    </p>
+                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            {% for gg in movie.genres.all %}
+                            <span class="badge bg-light text-dark small me-1">{{ gg.name }}</span>
+                            {% endfor %}
+                        </div>
+                        <button class="btn btn-sm btn-primary btn-view">Preview</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <div class="p-5 text-center empty-state rounded bg-light">
+                <h5>No movies found</h5>
+                <p class="mb-0">Try changing filters or search terms.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick view modal -->
+<div class="modal fade" id="movieModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-body p-0">
+                <div class="row g-0">
+                    <div class="col-md-5">
+                        <img id="modalPoster" src="/static/img/placeholder-film.png" class="img-fluid h-100 w-100"
+                            style="object-fit:cover" alt="">
+                    </div>
+                    <div class="col-md-7 p-4">
+                        <h4 id="modalTitle"></h4>
+                        <p id="modalDesc" class="text-muted small"></p>
+                        <div class="mt-3">
+                            <a href="#" id="modalDetailsLink" class="btn btn-primary">View details</a>
+                            <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Simple client-side filtering and modal behavior (no external dependencies required)
+    (function () {
+        const genres = document.querySelectorAll('.badge-genre');
+        const cards = Array.from(document.querySelectorAll('#moviesGrid .card-movie'));
+        const viewButtons = document.querySelectorAll('.btn-view');
+        const modal = new bootstrap.Modal(document.getElementById('movieModal'));
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalPoster = document.getElementById('modalPoster');
+        const modalDetailsLink = document.getElementById('modalDetailsLink');
+
+        function filterByGenre(name) {
+            cards.forEach(c => {
+                const list = (c.dataset.genreList || '').toLowerCase();
+                if (!name || name === '') {
+                    c.parentElement.style.display = '';
+                } else {
+                    c.parentElement.style.display = list.includes(name.toLowerCase() + '|') ? '' : 'none';
+                }
+            });
+        }
+
+        genres.forEach(b => {
+            b.addEventListener('click', () => {
+                genres.forEach(x => x.classList.remove('bg-primary', 'text-white'));
+                b.classList.add('bg-primary', 'text-white');
+                filterByGenre(b.dataset.genre);
+            });
+        });
+
+        function openModalFromData(target) {
+            const card = target.closest('.card-movie');
+            const title = card.dataset.title || target.dataset.title || '';
+            const desc = card.dataset.desc || target.dataset.desc || '';
+            const poster = card.dataset.poster || target.dataset.poster || '/static/img/placeholder-film.png';
+            modalTitle.textContent = title;
+            modalDesc.textContent = desc;
+            modalPoster.src = poster;
+            // optional: if detail page exists, link by slug or id; fallback '#'
+            modalDetailsLink.href = '#';
+            modal.show();
+        }
+
+        viewButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openModalFromData(e.currentTarget);
+            });
+        });
+
+        // clicking card image/title also opens modal
+        cards.forEach(c => {
+            c.addEventListener('click', (e) => {
+                // avoid triggering when clicking buttons inside card
+                if (e.target.closest('button')) return;
+                openModalFromData(c);
+            });
+        });
+    })();
+</script>
+{% endblock content %}
