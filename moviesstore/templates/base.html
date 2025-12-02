@@ -1,112 +1,508 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 {% load static %}
 
 <head>
     <meta charset="UTF-8">
     <title>{{ template_data.title }}</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous">
-    </script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-
-    <!-- Local Bootstrap CSS -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-dark: #0b5ed7;
+            --primary-light: #9ec5fe;
+            --accent: #6f42c1;
+            --dark: #212529;
+            --light: #f8f9fa;
+        }
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Enhanced Modern Navigation */
+        .navbar-main {
+            background: rgba(33, 37, 41, 0.98) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .navbar-main.scrolled {
+            padding: 0.5rem 0;
+            background: rgba(33, 37, 41, 0.95) !important;
+        }
+        
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        
+        .brand-logo {
+            height: 40px;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+        
+        .brand-logo:hover {
+            transform: scale(1.05) rotate(-2deg);
+        }
+        
+        .brand-text {
+            font-weight: 700;
+            font-size: 1.4rem;
+            background: linear-gradient(90deg, #ffffff, #9ec5fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-link-custom {
+            color: #e9ecef !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            margin: 0 0.2rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-link-custom i {
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-link-custom:hover {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .nav-link-custom:hover i {
+            transform: scale(1.1);
+        }
+        
+        .nav-link-custom.active {
+            color: white !important;
+            background: rgba(13, 110, 253, 0.2);
+            font-weight: 600;
+        }
+        
+        .nav-link-custom.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .nav-divider-custom {
+            width: 1px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0 0.5rem;
+        }
+        
+        /* Cart Badge */
+        .cart-wrapper {
+            position: relative;
+        }
+        
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #dc3545, #ff6b6b);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6px;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* User Menu */
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        
+        /* Mobile Toggle Button */
+        .navbar-toggler-custom {
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-toggler-custom:hover {
+            border-color: var(--primary);
+            background: rgba(13, 110, 253, 0.1);
+        }
+        
+        .navbar-toggler-custom:focus {
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+        }
+        
+        /* Mobile Menu */
+        @media (max-width: 991px) {
+            .navbar-collapse-custom {
+                background: rgba(33, 37, 41, 0.98);
+                border-radius: 0 0 12px 12px;
+                padding: 1rem;
+                margin-top: 1rem;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-top: none;
+            }
+            
+            .nav-divider-custom {
+                display: none;
+            }
+            
+            .nav-link-custom {
+                padding: 0.75rem 1rem !important;
+                margin: 0.25rem 0;
+            }
+            
+            .nav-link-custom.active::after {
+                display: none;
+            }
+            
+            .user-menu {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+        }
+        
+        /* Content Enhancements */
+        .content-card {
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .content-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+        
+        .featured-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            animation: glow 2s infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(255, 107, 107, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(255, 107, 107, 0.8); }
+        }
+        
+        /* CTA Buttons */
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
+            color: white;
+        }
+        
+        body {
+            padding-top: 70px;
+        }
+        
+        /* Loading Animation */
+        .loading-placeholder {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 6px;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
-    <!-- Header -->
-    <nav class="p-3 navbar navbar-dark bg-dark navbar-expand-lg">
+    <!-- Modern Enhanced Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-main fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home.index' %}">
-                <img src="{% static 'img/logo.png' %}" alt="logo" height="40" />
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                <div class="navbar-nav ms-auto navbar-ml">
-                    <a class="nav-link" href="{% url 'home.about' %}">About</a>
-                    <a class="nav-link" href="{% url 'movies.index' %}">Movies</a>
-                    <div class="vr bg-white mx-2 d-none d-lg-block"></div>
-                    {% if user.is_authenticated %}
-                    <a class="nav-link" href="{% url 'accounts.orders' %}">Orders
-                    </a>
-                    <a class="nav-link" href="{% url 'accounts.logout' %}">Logout ({{ user.username }})</a>
-                    {% else %}
-                    <a class="nav-link" href="{% url 'accounts.login' %}">Login</a>
-                    <a class="nav-link" href="{% url 'accounts.signup' %}">Sign Up</a>
-                    {% endif %}
+            <!-- Brand with Logo -->
+            <a class="navbar-brand p-0" href="{% url 'home.index' %}">
+                <div class="brand-wrapper">
+                    <img src="{% static 'img/logo.png' %}" alt="Movies Store" class="brand-logo">
+                    <span class="brand-text d-none d-md-block">MS</span>
                 </div>
+            </a>
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler navbar-toggler-custom" type="button" data-bs-toggle="collapse" 
+                    data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" 
+                    aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <!-- Navigation Content -->
+            <div class="collapse navbar-collapse navbar-collapse-custom" id="mainNavbar">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link-custom {% if request.resolver_match.url_name == 'home.about' %}active{% endif %}" 
+                           href="{% url 'home.about' %}">
+                            <i class="fas fa-info-circle"></i> About
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link-custom {% if 'movies' in request.resolver_match.url_name %}active{% endif %}" 
+                           href="{% url 'movies.index' %}">
+                            <i class="fas fa-film"></i> Movies
+                        </a>
+                    </li>
+                    
+                    <!-- Divider for Desktop -->
+                    <li class="nav-item d-none d-lg-block">
+                        <div class="nav-divider-custom"></div>
+                    </li>
+                    
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link-custom {% if 'orders' in request.resolver_match.url_name %}active{% endif %}" 
+                           href="{% url 'accounts.orders' %}">
+                            <i class="fas fa-shopping-bag"></i> Orders
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <!-- Right Side: User & Cart -->
+                <div class="d-flex align-items-center">
+                    {% if user.is_authenticated %}
+                    <div class="user-menu d-none d-lg-flex">
+                        <div class="user-avatar">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <span class="d-none d-xl-inline">{{ user.username }}</span>
+                    </div>
+                    <a class="nav-link-custom ms-2" href="{% url 'accounts.logout' %}">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="d-none d-lg-inline">Logout</span>
+                    </a>
+                    {% else %}
+                    <a class="nav-link-custom me-2" href="{% url 'accounts.login' %}">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    <a class="cta-button" href="{% url 'accounts.signup' %}">
+                        <i class="fas fa-user-plus me-1"></i> Sign Up
+                    </a>
+                    {% endif %}
+                    
+                    <!-- Cart with Badge -->
+                    <a class="nav-link-custom cart-wrapper ms-3" href="{% url 'cart.index' %}">
+                        <i class="fas fa-shopping-cart"></i>
+                        {% with cart=request.session.cart %}
+                            {% if cart and cart|length > 0 %}
+                            <span class="cart-badge">{{ cart|length }}</span>
+                            {% endif %}
+                        {% endwith %}
+                    </a>
+                </div>
+                
+                <!-- Mobile User Info -->
+                {% if user.is_authenticated %}
+                <div class="d-lg-none mt-3 pt-3 border-top border-secondary">
+                    <div class="user-menu">
+                        <div class="user-avatar">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <span>{{ user.username }}</span>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
     </nav>
-    <!-- Header -->
 
-    <!-- About Movies Store (rich text section) -->
-    <section class="container my-4">
-        <div class="p-4 bg-light rounded shadow-sm">
-            <h2 class="mb-3">About Movies Store</h2>
-            <p class="mb-2">Movies Store is a curated online marketplace built for film lovers. We collect timeless
-                classics and fresh releases, pairing each title with concise editorial notes and thoughtful
-                recommendations so you can discover your next favorite film without the noise.</p>
-            <p class="mb-2">Our catalogue spans genres and eras — from intimate indie dramas and foreign gems to
-                blockbuster adventures and family favorites. Every week our editors highlight a selection of
-                staff-picked titles, seasonal collections, and hidden treasures worth exploring.</p>
-            <p class="mb-2">We make buying or renting simple and secure: browse films, add them to your cart, and
-                complete checkout with confidence. If you need help, our support team and community reviews help guide
-                your choice — and you can always return to our curated lists for inspiration.</p>
-            <p class="mb-0">Ready to explore? <a href="{% url 'movies.index' %}">Browse the collection</a> or <a
-                    href="{% url 'cart.index' %}">view your cart</a> to continue where you left off.</p>
-        </div>
-    </section>
+    <!-- Main Content -->
+    <div class="container mt-4 pt-2">
+        <!-- About Movies Store (rich text section) -->
+        <section class="my-4">
+            <div class="content-card p-4">
+                <h2 class="mb-3 text-dark">About Movies Store</h2>
+                <p class="mb-3">Movies Store is a curated online marketplace built for film lovers. We collect timeless
+                    classics and fresh releases, pairing each title with concise editorial notes and thoughtful
+                    recommendations so you can discover your next favorite film without the noise.</p>
+                <p class="mb-3">Our catalogue spans genres and eras — from intimate indie dramas and foreign gems to
+                    blockbuster adventures and family favorites. Every week our editors highlight a selection of
+                    staff-picked titles, seasonal collections, and hidden treasures worth exploring.</p>
+                <p class="mb-3">We make buying or renting simple and secure: browse films, add them to your cart, and
+                    complete checkout with confidence. If you need help, our support team and community reviews help guide
+                    your choice — and you can always return to our curated lists for inspiration.</p>
+                <p class="mb-0">Ready to explore? 
+                    <a href="{% url 'movies.index' %}" class="text-primary fw-bold">Browse the collection</a> or 
+                    <a href="{% url 'cart.index' %}" class="text-primary fw-bold">view your cart</a> to continue where you left off.
+                </p>
+            </div>
+        </section>
 
-    <!-- Featured Movie (dynamic) -->
-    {% if featured_movie %}
-    <section class="container mb-4">
-        <div class="card mb-3">
-            <div class="row g-0 align-items-center">
-                <div class="col-12 col-md-3 text-center p-3">
-                    {% if featured_movie.image and featured_movie.image.url %}
-                    <img src="{{ featured_movie.image.url }}" alt="{{ featured_movie.name }}" class="img-fluid rounded"
-                        style="max-height:180px;object-fit:cover;" />
-                    {% else %}
-                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center"
-                        style="height:180px;">Poster</div>
-                    {% endif %}
-                </div>
-                <div class="col-12 col-md-9">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ featured_movie.name }}
-                            <small class="text-muted">— ${{ featured_movie.price }}
-                            </small>
-                        </h5>
-                        <p class="card-text">{{ featured_movie.description|truncatechars:160 }}</p>
-                        <a href="{% url 'movies.index' %}" class="btn btn-primary btn-sm">See More</a>
-                        <a href="{% url 'cart.add' featured_movie.id %}"
-                            class="btn btn-outline-secondary btn-sm ms-2">Add to Cart</a>
+        <!-- Featured Movie (dynamic) -->
+        {% if featured_movie %}
+        <section class="mb-4">
+            <div class="content-card overflow-hidden position-relative">
+                <span class="featured-badge">FEATURED</span>
+                <div class="row g-0 align-items-center">
+                    <div class="col-12 col-md-3 text-center p-3">
+                        {% if featured_movie.image and featured_movie.image.url %}
+                        <img src="{{ featured_movie.image.url }}" alt="{{ featured_movie.name }}" 
+                             class="img-fluid rounded" style="max-height:180px;object-fit:cover; width:100%;" />
+                        {% else %}
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded"
+                             style="height:180px;">
+                            <i class="fas fa-film fa-3x opacity-50"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark">{{ featured_movie.name }}
+                                <small class="text-muted">— ${{ featured_movie.price }}
+                                </small>
+                            </h5>
+                            <p class="card-text">{{ featured_movie.description|truncatechars:160 }}</p>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'movies.index' %}" class="cta-button btn-sm">See More</a>
+                                <a href="{% url 'cart.add' featured_movie.id %}" 
+                                   class="btn btn-outline-primary btn-sm">Add to Cart</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-    {% endif %}
+        </section>
+        {% endif %}
 
-    <div>
-        {% block content %}
-        {% endblock content %}
+        <!-- Content Block -->
+        <div>
+            {% block content %}
+            {% endblock content %}
+        </div>
+        
+        <!-- Quick Stats Section -->
+        <section class="my-5 py-4">
+            <div class="row g-4 text-center">
+                <div class="col-md-3 col-6">
+                    <div class="content-card p-3">
+                        <div class="display-5 text-primary mb-2">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <h5 class="mb-1">Curated Collection</h5>
+                        <p class="text-muted small mb-0">Hand-picked movies</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="content-card p-3">
+                        <div class="display-5 text-primary mb-2">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <h5 class="mb-1">Instant Access</h5>
+                        <p class="text-muted small mb-0">Watch immediately</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="content-card p-3">
+                        <div class="display-5 text-primary mb-2">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h5 class="mb-1">Premium Quality</h5>
+                        <p class="text-muted small mb-0">HD & 4K available</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="content-card p-3">
+                        <div class="display-5 text-primary mb-2">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h5 class="mb-1">24/7 Support</h5>
+                        <p class="text-muted small mb-0">We're here to help</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <!-- Footer -->
-    <section class="p-3 ms-footer d-none d-md-block">
+    <!-- Footer (Keeping your original footer) -->
+    <section class="p-3 ms-footer d-none d-md-block bg-dark">
         <div class="container">
             <div class="row mt-3 text-white">
                 <div class="col-md-6 col-lg-6 col-xl-6 mx-auto mb-4">
@@ -118,21 +514,20 @@
                         other! Dive into the world of movies from the
                         comfort of your own home with our userfriendly and immersive online movie store.
                     </p>
-
                 </div>
                 <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mb-4">
                     <b>LINKS</b>
                     <hr />
-                    <p><a class="nav-link" href="{% url 'home.about' %}">
+                    <p><a class="nav-link p-0 text-white-50" href="{% url 'home.about' %}">
                             About
                         </a></p>
                     <p>
-                        <a class="nav-link" href="{% url 'movies.index'%}">
+                        <a class="nav-link p-0 text-white-50" href="{% url 'movies.index'%}">
                             Movies
                         </a>
                     </p>
                     <p>
-                        <a class="nav-link" href="{% url 'cart.index' %}">Cart</a>
+                        <a class="nav-link p-0 text-white-50" href="{% url 'cart.index' %}">Cart</a>
                     </p>
                 </div>
                 <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mb-4">
@@ -154,7 +549,7 @@
         <div class="container d-flex justify-content-between">
             <div class="me-5 text-white">
                 <span>DESIGNED BY
-                    <a href="https://www.x.com/wacko96" target="_blank">SWEETMANN</a>
+                    <a href="https://www.x.com/wacko96" target="_blank" class="text-primary">SWEETMANN</a>
                 </span>
             </div>
             <div class="text-white">
@@ -164,11 +559,87 @@
     </section>
     <!-- Footer -->
 
-    <!-- Local Bootstrap JS -->
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-
+    <!-- Scripts -->
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar-main');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+        
+        // Active link highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link-custom');
+            
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Animate cards on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all content cards
+            document.querySelectorAll('.content-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+        });
+        
+        // Cart badge animation
+        const cartLink = document.querySelector('.cart-wrapper');
+        if (cartLink) {
+            cartLink.addEventListener('click', function() {
+                const badge = this.querySelector('.cart-badge');
+                if (badge) {
+                    badge.style.transform = 'scale(1.3)';
+                    setTimeout(() => {
+                        badge.style.transform = 'scale(1)';
+                    }, 300);
+                }
+            });
+        }
+        
+        // Mobile menu close on click
+        document.querySelectorAll('.nav-link-custom').forEach(link => {
+            link.addEventListener('click', function() {
+                const navbarCollapse = document.getElementById('mainNavbar');
+                if (navbarCollapse.classList.contains('show')) {
+                    const bsCollapse = new bootstrap.Collapse(navbarCollapse);
+                    bsCollapse.hide();
+                }
+            });
+        });
+        
+        // Add hover sound effect simulation
+        document.querySelectorAll('.nav-link-custom, .cta-button').forEach(element => {
+            element.addEventListener('mouseenter', function() {
+                this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            });
+        });
+    </script>
+    
     {% block scripts %}
     {% endblock scripts %}
 </body>
-
 </html>
